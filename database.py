@@ -18,6 +18,7 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
+    
 
 def log_data(temp, hum, light, mode):
     conn = sqlite3.connect(DB_NAME)
