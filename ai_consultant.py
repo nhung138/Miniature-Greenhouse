@@ -1,8 +1,16 @@
+import os
 import google.generativeai as genai
 import sqlite3
+from dotenv import load_dotenv
 
-# Cấu hình API Key (Lấy tại aistudio.google.com)
-genai.configure(api_key="AQ.Ab8RN6Locp52E7a_NVP-pb9sEmk4boU6DBcteBM4sBFB0sdk8A")
+# Nạp các biến môi trường từ file .env vào hệ thống ngầm
+load_dotenv()
+
+# Lấy API Key một cách an toàn từ môi trường
+api_key = os.getenv("GEMINI_API_KEY2")
+
+# Cấu hình API Key bảo mật cho Gemini
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-2.0-flash')
 
 def get_ai_advice():

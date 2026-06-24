@@ -2,5 +2,5 @@
 __pycache__/
 *.pyc
 node_modules/
-greenhouse_data.db/
-
+greenhouse_data.db
+.env
