@@ -4,7 +4,7 @@ import sqlite3
 from dotenv import load_dotenv
 
 # Nạp các biến môi trường từ file .env vào hệ thống ngầm
-load_dotenv()
+load_dotenv()      
 
 # Lấy API Key một cách an toàn từ môi trường
 api_key = os.getenv("GEMINI_API_KEY2")
