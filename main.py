@@ -39,7 +39,6 @@ def get_system_mode(light_val, temp, hum, force_hour=None):
     else:
         return "CLOUDY", "OPEN"
 
-
 def run_normal_mode(forced_hour=None):
     init_db()
 
@@ -62,6 +61,12 @@ def run_normal_mode(forced_hour=None):
     
     try:
         while True:
+            # 🌟 GIẢI PHÁP 1: ÉP PYTHON ĐỌC LẠI TIMEZONE MỚI TỪ OS TRÊN MỖI CHU KỲ
+            try:
+                time.tzset()
+            except AttributeError:
+                pass # Bỏ qua nếu chạy thử nghiệm trên Windows/macOS
+
             # BƯỚC 1: ĐỌC DỮ LIỆU CẢM BIẾN TRƯỚC
             temp, hum = dht.read()
             light_val = ldr.read_value() 
@@ -122,7 +127,7 @@ def run_normal_mode(forced_hour=None):
             else:
                 servo.close()
             
-            # Lưu log và hiển thị lên LCD
+            # Lưu log (Lúc này hàm log_data lấy thời gian từ SQLite sẽ ăn theo Timezone mới)
             log_data(temp, hum, light_val, mode)
             lcd.display_data(temp, hum, light_val, mode, roof_txt)
             print(f"[{mode}] Nhiệt: {temp}°C | Ẩm: {hum}% | Sáng: {light_val:.2f} | Mái: {roof_txt}")
@@ -137,54 +142,63 @@ def run_normal_mode(forced_hour=None):
         servo.close()
         print("Hệ thống đã tắt.")
 
-
 if __name__ == "__main__":
     os.system('clear' if os.name == 'posix' else 'cls')
     
     print("HỆ THỐNG NHÀ KÍNH MINI - MINIATURE GREENHOUSE")
+    print("=> [Thực tế] Tự động kích hoạt Chế độ Thực tế...")
+    print("=> [Thực tế] Đang sử dụng giờ hệ thống...")
     
-    # --- PHẦN SỬA LỖI EOFError (Tự động hóa) ---
-    # Kiểm tra tham số từ command line: main.py [chế_độ] [thời_gian]
-    if len(sys.argv) >= 3:
-        choice = sys.argv[1]
-        time_choice = sys.argv[2]
-        print(f"Khởi động tự động: Chế độ {choice}, Thời gian {time_choice}")
-    else:
-        # Chạy thủ công
-        print("\n Vui lòng chọn chế độ khởi động:")
-        print("   [1] Chế độ Thực tế (Đọc cảm biến tự động)")
-        print("   [2] Chế độ Giả lập (Test phần cứng)")
-        choice = input("Nhập lựa chọn của bạn (1 hoặc 2): ").strip()
-        
-        if choice == '1':
-            print("\n--- CẤU HÌNH THỜI GIAN ---")
-            print("   [0] Thời gian thực tế")
-            print("   [1] Giả lập Ban ngày (10h sáng)")
-            print("   [2] Giả lập Ban đêm (20h tối)")
-            time_choice = input("Chọn thời gian (0/1/2): ").strip()
-        else:
-            time_choice = '0'
+    # Chạy thẳng chế độ thực tế với giờ mặc định của hệ thống (forced_hour = None)
+    run_normal_mode(forced_hour=None)
 
-    # --- LOGIC KHỞI ĐỘNG ---
-    if choice == '1':
-        forced_hour = None
-        if time_choice == '1': 
-            forced_hour = 10
-            print("=> [Giả lập] Bắt đầu với giờ: 10:00")
-        elif time_choice == '2': 
-            forced_hour = 20
-            print("=> [Giả lập] Bắt đầu với giờ: 20:00")
-        else:
-            print("=> [Thực tế] Đang sử dụng giờ hệ thống...")
+# if __name__ == "__main__":
+#     os.system('clear' if os.name == 'posix' else 'cls')
+    
+#     print("HỆ THỐNG NHÀ KÍNH MINI - MINIATURE GREENHOUSE")
+    
+#     # --- PHẦN SỬA LỖI EOFError (Tự động hóa) ---
+#     # Kiểm tra tham số từ command line: main.py [chế_độ] [thời_gian]
+#     if len(sys.argv) >= 3:
+#         choice = sys.argv[1]
+#         time_choice = sys.argv[2]
+#         print(f"Khởi động tự động: Chế độ {choice}, Thời gian {time_choice}")
+#     else:
+#         # Chạy thủ công
+#         print("\n Vui lòng chọn chế độ khởi động:")
+#         print("   [1] Chế độ Thực tế (Đọc cảm biến tự động)")
+#         print("   [2] Chế độ Giả lập (Test phần cứng)")
+#         choice = input("Nhập lựa chọn của bạn (1 hoặc 2): ").strip()
         
-        run_normal_mode(forced_hour)
+#         if choice == '1':
+#             print("\n--- CẤU HÌNH THỜI GIAN ---")
+#             print("   [0] Thời gian thực tế")
+#             print("   [1] Giả lập Ban ngày (10h sáng)")
+#             print("   [2] Giả lập Ban đêm (20h tối)")
+#             time_choice = input("Chọn thời gian (0/1/2): ").strip()
+#         else:
+#             time_choice = '0'
+
+#     # --- LOGIC KHỞI ĐỘNG ---
+#     if choice == '1':
+#         forced_hour = None
+#         if time_choice == '1': 
+#             forced_hour = 10
+#             print("=> [Giả lập] Bắt đầu với giờ: 10:00")
+#         elif time_choice == '2': 
+#             forced_hour = 20
+#             print("=> [Giả lập] Bắt đầu với giờ: 20:00")
+#         else:
+#             print("=> [Thực tế] Đang sử dụng giờ hệ thống...")
+        
+#         run_normal_mode(forced_hour)
             
-    elif choice == '2':
-        print("=> Bắt đầu nạp Chế độ Giả lập...")
-        try:
-            import mock_main
-            mock_main.test_system()
-        except ImportError:
-            print("❌ LỖI: Không tìm thấy file 'mock_main.py'.")
-    else:
-        print("❌ Lựa chọn không hợp lệ!")
+#     elif choice == '2':
+#         print("=> Bắt đầu nạp Chế độ Giả lập...")
+#         try:
+#             import mock_main
+#             mock_main.test_system()
+#         except ImportError:
+#             print("❌ LỖI: Không tìm thấy file 'mock_main.py'.")
+#     else:
+#         print("❌ Lựa chọn không hợp lệ!")

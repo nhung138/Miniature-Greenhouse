@@ -1,99 +1,70 @@
-# Miniature Greenhouse - Hệ thống Nhà kính Thông minh
+Miniature Greenhouse (Nhà kính Mini)
+Hệ thống nhà kính thông minh sử dụng Raspberry Pi, tích hợp cảm biến môi trường, cơ chế tư vấn chăm sóc cây trồng thông minh (Offline AI) và giao diện giám sát thời gian thực.
 
-Dự án này là giải pháp tự động hóa nhà kính thu nhỏ, sử dụng Raspberry Pi để giám sát môi trường và tự động điều khiển các cơ cấu chấp hành (Servo, LED RGB, Màn hình LCD), đảm bảo điều kiện sống tối ưu cho cây trồng.
+🏗️ Giới thiệu hệ thống
+Hệ thống tự động giám sát môi trường (nhiệt độ, độ ẩm, ánh sáng) và điều khiển cơ cấu chấp hành (mái che servo) dựa trên các chế độ thời tiết thực tế. Điểm đặc biệt của phiên bản này là hệ thống tự đưa ra lời khuyên chuyên gia dựa trên dữ liệu cảm biến mà không cần kết nối internet hay tiêu tốn lượt gọi API.
 
-Đặc biệt, hệ thống được trang bị 2 chế độ vận hành linh hoạt: Đọc cảm biến tự động (Thực tế) và Mô phỏng kịch bản (Giả lập phần cứng).
+⚙️ Điều kiện hoạt động và Logic xử lý
+Hệ thống vận hành dựa trên bộ lọc điều kiện chặt chẽ, phân loại môi trường thành 5 chế độ chính để đưa ra quyết định đóng/mở mái che tự động:
 
-## 1. Cấu trúc hệ thống
-Hệ thống vận hành theo cơ chế vòng lặp liên tục:
+SUNNY (Nắng): Ánh sáng cao (> 0.6), Độ ẩm < 80%.
 
-Thu thập dữ liệu cảm biến (Nhiệt độ, Độ ẩm, Cường độ sáng 0.0 - 1.0) → Kiểm tra ngưỡng (Thresholds) → Kích hoạt thiết bị chấp hành (Mở/Đóng mái che, Đổi màu đèn cảnh báo, Hiển thị LCD).
+Hành động: Mở mái che để cây nhận đủ ánh sáng quang hợp.
 
+CLOUDY (Nhiều mây): Ánh sáng trung bình (0.3 - 0.6), Độ ẩm < 80%.
 
-## 2. Logic vận hành chi tiết
-## 🌤️ Kịch bản Hoạt động (5 Chế độ Thời tiết)
+Hành động: Mở mái che, duy trì theo dõi nhiệt độ để đảm bảo cây không bị sốc nhiệt.
 
-Hệ thống phân tích mức độ ánh sáng (đọc qua bộ chuyển đổi ADC) thay vì thời gian thực, kết hợp với Nhiệt độ và Độ ẩm để đưa ra quyết định bảo vệ cây trồng.
+R_DAY (Ngày mưa): Ánh sáng ban ngày (> 0.3) nhưng Độ ẩm > 80%.
 
- Dưới đây là 5 kịch bản tự động của hệ thống:
+Hành động: Tự động đóng mái che để ngăn nước mưa làm ngập úng hoặc dập nát lá cây.
 
-### 1. ☀️ Chế độ Nắng gắt (SUNNY)
-* Điều kiện: Ánh sáng mạnh (> 0.85), Nhiệt độ > 23°C & Độ ẩm > 50%.
-* Hành động phần cứng:
-  * Mái che (Servo): ĐÓNG (Tắt LED trạng thái).
-  * Đèn cảnh báo (RGB): Sáng màu Vàng.
-  * Màn hình (LCD): Hiển thị SUNNY
-* Mục đích nông nghiệp: Cản bức xạ nhiệt trực tiếp, chống sốc nhiệt, ngăn chặn tình trạng mất nước bốc hơi nhanh và cháy lá cây.
+NIGHT (Đêm): Ánh sáng yếu (< 0.3), Độ ẩm < 80%.
 
-### 2. ☁️ Chế độ Nắng dịu / Nhiều mây (CLOUDY)
-* Điều kiện: Ban ngày (06h - 17h), ánh sáng vừa (0.55 đến 0.85) hoặc sáng mạnh nhưng nhiệt độ mát mẻ/độ ẩm thấp.
-* Hành động phần cứng:
-  * Mái che (Servo): MỞ (Bật sáng LED trạng thái).
-  * Đèn cảnh báo (RGB): Sáng màu Xanh dương.
-  * Màn hình (LCD): Hiển thị CLOUDY!
-* Mục đích nông nghiệp: Tận dụng tối đa nguồn sáng tự nhiên và gió lùa, giúp cây đẩy mạnh quá trình quang hợp và phát triển.
+Hành động: Giữ hệ thống ổn định, cây bước vào trạng thái nghỉ ngơi.
 
-### 3. 🌧️ Chế độ Mưa ban ngày (RAINY DAY)
-* Điều kiện: Ban ngày (06h - 17h), ánh sáng âm u (0.55 <= light <= 0.85), Độ ẩm không khí cao (>= 85%).
-* Hành động phần cứng:
-  * Mái che (Servo): ĐÓNG (Tắt LED trạng thái).
-  * Đèn cảnh báo (RGB): Sáng màu Trắng xám.
-  * Màn hình (LCD): Hiển thị R_DAY!.
-* Mục đích nông nghiệp: Che chắn kịp thời để tránh mưa lớn gây ngập úng thối gốc, xói mòn bề mặt đất và rửa trôi phân bón.
+R_NIGHT (Đêm mưa): Ánh sáng yếu (< 0.3) kết hợp Độ ẩm > 80%.
 
-### 4. 🌙 Chế độ Đêm tĩnh mịch (NIGHT)
-* Điều kiện: Ban đêm (18h - 05h), ánh sáng yếu/tắt hoàn toàn (< 0.55), điều kiện nhiệt độ và độ ẩm bình thường.
-* Hành động phần cứng:
-  * Mái che (Servo): ĐÓNG (Tắt LED trạng thái).
-  * Đèn cảnh báo (RGB): Sáng màu Tím.
-  * Màn hình (LCD): Hiển thị NIGHT!
-* Mục đích nông nghiệp: Hoạt động như một lớp màng cách nhiệt giúp giữ ấm đất, chống hiện tượng sương muối gây nấm bệnh trên lá và ngăn cản côn trùng, dịch hại hoạt động về đêm.
+Hành động: Đóng mái che tuyệt đối để bảo vệ cây khỏi mưa đêm.
 
-### 5. ⛈️ Chế độ Mưa lạnh ban đêm (RAINY NIGHT)
-* Điều kiện: Ban đêm (18h - 05h), ánh sáng yếu/tắt hoàn toàn (< 0.55), Nhiệt độ > 23°C & Độ ẩm cực cao (>= 85%).
-* Hành động phần cứng:
-  * Mái che (Servo): ĐÓNG (Tắt LED trạng thái).
-  * Đèn cảnh báo (RGB): Sáng màu Xanh lơ (Cyan).
-  * Màn hình (LCD): Hiển thị R_NIGHT!
-* Mục đích nông nghiệp: Bảo vệ khẩn cấp, ngăn chặn ngập úng cục bộ và hạn chế rủi ro cây bị hạ thân nhiệt đột ngột do nước mưa lạnh.
+Lưu ý: Các ngưỡng thông số này được cấu hình linh hoạt trong main.py để phù hợp với từng giống cây trồng cụ thể.
 
-## 3. Cấu trúc dự án
-miniature_greenhouse/
-├── main.py              # File chạy chính (Menu & Chế độ tự động)
-├── mock_main.py         # File chứa Chế độ Giả lập (Mô phỏng thời tiết)
-├── config.py            # Cấu hình chân GPIO, ngưỡng ánh sáng (0.55 - 0.85)
-├── modules/
-│   ├── sensors/         # Xử lý cảm biến DHT, Light Sensor (LDR + MCP3208)
-│   ├── actuators/       # Xử lý Servo, LED RGB
-│   └── display/         # Xử lý màn hình LCD I2C
-└── README.md            # Tài liệu dự án
+🧠 Cơ chế tư vấn thông minh (Offline)
+Thay vì gọi API bên thứ ba, hệ thống sử dụng module ai_consultant.py được tối ưu hóa:
 
-## 4. Hướng dẫn vận hành
-Yêu cầu tiên quyết
-Hệ điều hành Raspberry Pi OS đã bật I2C (thông qua raspi-config).
-Thư viện lgpio và gpiozero đã được cài đặt trên hệ thống.
+Logic hoạt động: Dựa trên trạng thái (current_mode), hệ thống truy xuất vào kho dữ liệu lời khuyên được định nghĩa sẵn.
 
-### Các bước thực thi
+Song ngữ: Mỗi lời khuyên được thiết kế chuẩn song ngữ Nhật - Việt, mang phong cách vui tươi, truyền cảm hứng.
 
-4.1: Luôn làm bước này khi mở Terminal mới
-source venv/bin/activate
+Độ trễ: Phản hồi gần như tức thì (~0.1s), đảm bảo giao diện luôn cập nhật trạng thái mới nhất ngay khi cảm biến thay đổi.
 
-4.2: Chạy chương trình
-python main.py
+Độ ổn định: Không lỗi 429 (Quota Exceeded), không phụ thuộc mạng, an toàn tuyệt đối cho buổi thuyết trình.
 
-4.3: Hệ thống sẽ hiển thị Menu lựa chọn:
-      Nhấn 1: Chạy Chế độ Thực tế. Hệ thống sẽ tự động đọc cảm biến thật để điều khiển mái che và đèn.
+🛠️ Hướng dẫn cài đặt & Chạy hệ thống
+1. Cấu trúc logic điều khiển
+main.py: Đọc cảm biến DHT22, tính toán chế độ (SUNNY, CLOUDY, R_DAY, NIGHT), gửi dữ liệu về API.
 
-      Nhấn 2: Chạy Chế độ Giả lập (gọi từ mock_main.py). Cho phép bạn tự chọn 1 trong 5 thời tiết để test hoạt động của LED, Servo và màn hình LCD mà không cần tác động vào cảm biến.
+api.py: Nhận trạng thái từ main.py, gọi hàm get_pro_advice từ ai_consultant.py để lấy lời khuyên.
 
-      (Bấm Ctrl + C bất cứ lúc nào để thoát chương trình an toàn, hệ thống sẽ tự động dọn dẹp và tắt linh kiện).
+ai_consultant.py: Chứa kho dữ liệu lời khuyên (Hardcoded Advice).
 
-## 5. Tùy chỉnh (config.py)
-Để thay đổi thông số hoạt động, hãy chỉnh sửa trực tiếp tại file config.py:
+2. Lệnh khởi động (Sau khi bật máy)
+Chỉ cần mở Terminal và chạy lệnh sau để khôi phục toàn bộ tiến trình:
 
-THRESHOLDS: Điều chỉnh các ngưỡng LIGHT_HIGH (mặc định 0.85) và LIGHT_LOW (mặc định 0.55) để phù hợp với độ nhạy của cảm biến quang (LDR).
+Bash
+pm2 resurrect
+Lưu ý: Nếu cần khởi tạo mới hoàn toàn:
 
-GPIO: Cập nhật sơ đồ chân cắm nếu có thay đổi phần cứng (ví dụ: chuyển chân LED RGB, Servo).
+Bash
+pm2 delete all
+pm2 start api.py --name "api-backend" --interpreter .venv/bin/python
+pm2 start main.py --name "hardware-main" --interpreter .venv/bin/python
+pm2 start npm --name "web-frontend" --cwd greenhouse-dashboard -- start
+pm2 save
+⚙️ Quản lý tiến trình với PM2
+Kiểm tra trạng thái: pm2 status
 
-LCD: Cấu hình địa chỉ I2C (thường là 0x27) và thông số kích thước màn hình.
+Xem logs trực tiếp (rất hữu ích để demo): ```bash
+pm2 logs hardware-main --lines 20
 
+Lưu cấu hình khởi động: Luôn nhớ chạy pm2 save sau khi thay đổi bất kỳ tiến trình nào.
