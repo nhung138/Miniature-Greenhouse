@@ -100,15 +100,87 @@ export default function Dashboard() {
   if (loading) return <div className="p-10 text-center text-xl">Đang tải dữ liệu nhà kính...</div>;
 
   return (
+    // <main className="p-4 md:p-8 bg-gray-50 min-h-screen">
+    //   <h1 className="text-3xl font-bold mb-8 text-gray-800">🌱 Miniature Greenhouse Dashboard</h1>
+      
+    //   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    //     {/* Biểu đồ */}
+    //     {/* Sửa lại đoạn Biểu đồ này trong page.tsx */}
+    //     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100" style={{ minHeight: '300px' }}>
+    //       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-700">
+    //         <Activity className="text-purple-500" /> Biểu đồ theo dõi
+    //       </h2>
+    //       <div className="h-64 w-full">
+    //         <ResponsiveContainer width="100%" height="100%">
+    //           <LineChart data={data}>
+    //             <CartesianGrid strokeDasharray="3 3" />
+    //             <XAxis dataKey="time" hide />
+    //             <YAxis />
+    //             <Tooltip />
+    //             <Legend />
+    //             <Line type="monotone" dataKey="temp" stroke="#ef4444" name="Nhiệt độ (°C)" strokeWidth={2} />
+    //             <Line type="monotone" dataKey="hum" stroke="#3b82f6" name="Độ ẩm (%)" strokeWidth={2} />
+    //           </LineChart>
+    //         </ResponsiveContainer>
+    //       </div>
+    //     </div>
+
+    //     {/* Trạng thái hiện tại */}
+    //     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+    //       <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-gray-700">
+    //         <Sun className="text-yellow-500" /> Thông số thời gian thực
+    //       </h2>
+    //       {data.length > 0 ? (
+    //         <div className="space-y-6">
+    //           <div className="flex justify-between items-center p-4 bg-red-50 rounded-lg">
+    //             <span className="font-medium text-red-600">Nhiệt độ:</span>
+    //             <span className="text-2xl font-bold">{data[data.length - 1].temp}°C</span>
+    //           </div>
+    //           <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+    //             <span className="font-medium text-blue-600">Độ ẩm:</span>
+    //             <span className="text-2xl font-bold">{data[data.length - 1].hum}%</span>
+    //           </div>
+    //           <div className="text-sm text-gray-500 italic">
+    //             Thời gian: {data[data.length - 1].time} | Chế độ: {data[data.length - 1].mode}
+    //           </div>
+    //         </div>
+    //       ) : (
+    //         <p>Chưa có dữ liệu</p>
+    //       )}
+    //     </div>
+    //   </div>
+
+      
+
+    // {/* 2 Khối tách biệt: Hệ thống & AI */}
+    //   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+        
+    //     {/* Phần 1: Báo cáo hệ thống (Tức thì) */}
+    //     <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-emerald-500">
+    //       <h2 className="text-xl font-semibold text-slate-800 mb-2">Báo cáo Hệ thống</h2>
+    //       <p className="text-slate-700 leading-relaxed italic">{status.system_report}</p>
+    //       <div className="mt-4 text-xs text-slate-400">
+    //       Hệ thống phân tích tự động - Cập nhật lúc {new Date().toLocaleTimeString()}
+    //       </div>
+    //     </div>
+
+    //     {/* Phần 2: AI Consultant (Phân tích) */}
+    //     <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
+    //       <h2 className="text-xl font-semibold text-slate-800 mb-2">Góc nhìn chuyên gia (Gemini AI)</h2>
+    //       <p className="text-slate-700 leading-relaxed">{status.ai_advice}</p>
+    //     </div>
+
+    //   </div>
+    // </main>
+
     <main className="p-4 md:p-8 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold mb-8 text-gray-800">🌱 Miniature Greenhouse Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-8 text-gray-800">ミニチュア温室</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Biểu đồ */}
-        {/* Sửa lại đoạn Biểu đồ này trong page.tsx */}
+        {/* Biểu đồ (モニタリングチャート) */}
         <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100" style={{ minHeight: '300px' }}>
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-gray-700">
-            <Activity className="text-purple-500" /> Biểu đồ theo dõi
+            <Activity className="text-purple-500" /> 環境モニタリング
           </h2>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -118,59 +190,58 @@ export default function Dashboard() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="temp" stroke="#ef4444" name="Nhiệt độ (°C)" strokeWidth={2} />
-                <Line type="monotone" dataKey="hum" stroke="#3b82f6" name="Độ ẩm (%)" strokeWidth={2} />
+                <Line type="monotone" dataKey="temp" stroke="#ef4444" name="温度 (°C)" strokeWidth={2} />
+                <Line type="monotone" dataKey="hum" stroke="#3b82f6" name="湿度 (%)" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Trạng thái hiện tại */}
+        {/* Trạng thái hiện tại (リアルタイムステータス) */}
         <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-gray-700">
-            <Sun className="text-yellow-500" /> Thông số thời gian thực
+            <Sun className="text-yellow-500" /> リアルタイムステータス
           </h2>
           {data.length > 0 ? (
             <div className="space-y-6">
               <div className="flex justify-between items-center p-4 bg-red-50 rounded-lg">
-                <span className="font-medium text-red-600">Nhiệt độ:</span>
+                <span className="font-medium text-red-600">温度:</span>
                 <span className="text-2xl font-bold">{data[data.length - 1].temp}°C</span>
               </div>
               <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
-                <span className="font-medium text-blue-600">Độ ẩm:</span>
+                <span className="font-medium text-blue-600">湿度:</span>
                 <span className="text-2xl font-bold">{data[data.length - 1].hum}%</span>
               </div>
               <div className="text-sm text-gray-500 italic">
-                Thời gian: {data[data.length - 1].time} | Chế độ: {data[data.length - 1].mode}
+                更新時刻: {data[data.length - 1].time} | 動作モード: {data[data.length - 1].mode}
               </div>
             </div>
           ) : (
-            <p>Chưa có dữ liệu</p>
+            <p>データを受信していません</p>
           )}
         </div>
       </div>
 
-      
-
     {/* 2 Khối tách biệt: Hệ thống & AI */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
         
-        {/* Phần 1: Báo cáo hệ thống (Tức thì) */}
+        {/* Phần 1: Báo cáo hệ thống (システムレポート) */}
         <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-emerald-500">
-          <h2 className="text-xl font-semibold text-slate-800 mb-2">Báo cáo Hệ thống</h2>
+          <h2 className="text-xl font-semibold text-slate-800 mb-2">システムレポート</h2>
           <p className="text-slate-700 leading-relaxed italic">{status.system_report}</p>
           <div className="mt-4 text-xs text-slate-400">
-          Hệ thống phân tích tự động - Cập nhật lúc {new Date().toLocaleTimeString()}
+          自動診断システム - 最終更新: {new Date().toLocaleTimeString()}
           </div>
         </div>
 
-        {/* Phần 2: AI Consultant (Phân tích) */}
+        {/* Phần 2: 専門家のアドバイス */}
         <div className="bg-white p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
-          <h2 className="text-xl font-semibold text-slate-800 mb-2">Góc nhìn chuyên gia (Gemini AI)</h2>
+          <h2 className="text-xl font-semibold text-slate-800 mb-2">専門家のアドバイス</h2>
           <p className="text-slate-700 leading-relaxed">{status.ai_advice}</p>
         </div>
 
       </div>
     </main>
+
   );
 }
