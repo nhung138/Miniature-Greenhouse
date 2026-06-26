@@ -4,3 +4,4 @@ __pycache__/
 node_modules/
 greenhouse_data.db
 .env
+greenhouse_data.db
